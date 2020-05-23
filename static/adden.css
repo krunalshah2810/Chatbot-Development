@@ -1,0 +1,309 @@
+body{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	
+}
+
+
+.nav{
+	position: fixed;
+	width:20%;
+	height:100%;
+	background-color: #F8F8F8;
+	float:left;
+	border-style: solid solid none none ;
+	border-width:1px;
+	border-color:#E7E7E7;
+	
+}
+
+.nav > div{
+	width:100%;
+	height:50px;
+
+}
+
+.nav .menus{
+	line-height: 50px;
+}
+
+.nav .logo{
+	height:100px;
+	border-style: none none solid none;
+	border-width:1px;
+	border-color:#E7E7E7;
+	box-sizing: border-box;
+	position: relative;
+	display: flex;
+	padding:20px;
+	font-size:28px;
+	font-weight: bold;
+	font-family: "arial"
+	
+
+}
+
+.logos{
+	position: relative;
+	flex-basis:50px;
+	height:50px;
+	margin-right: 10px;
+	margin-left:20px;
+
+}
+
+.logos img{
+	position: absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+
+}
+
+.name{
+
+	
+	position: relative;
+	line-height: 200%;
+	color:#868686;
+}
+
+.select{
+	
+	padding-left:10%;
+	padding-right:10%;
+	line-height: 40px;
+	
+}
+
+.select img{
+	margin:auto;
+}
+
+.sel_project{
+	background-color: transparent;
+	margin-top:5px;
+	width:70%;
+	float:left;
+	margin-right: 20px;
+}
+
+.menus{
+	margin:0;
+	padding:0;
+}
+
+
+.menus div{
+	width:80%;
+	margin-left:10%;
+}
+
+.menus a{
+	text-decoration: none;
+	color:black;
+}
+
+.menus:hover{
+	background-color: #B7BBC4;
+	
+}
+
+.menus:hover a{
+	color:white;
+	font-weight: bold;
+}
+
+
+
+.main{
+	position: absolute;
+	width:55%;
+	height:50px;
+	margin-left: 20%;
+	padding:20px;
+}
+
+.entity_input{
+	margin-bottom:50px;
+}
+
+/*input[type='text'],
+input[type='number'],
+input[type='password'],
+textarea {
+outline: none;
+box-shadow:none !important;
+border-style:none none solid none;
+border-width: 2px;
+border-color: black;
+}*/
+
+.ename{
+	width:80%;
+	float:left;
+	margin-right:5%;
+	border-style:none none solid none;
+	font-size:25px;
+	outline: none;
+    box-shadow:none !important;
+    border-width: 2px;
+    border-radius: 0;
+
+
+}
+
+.ename:focus,
+.ename:active {
+  border-color: transparent;
+  border-bottom: 2px solid #007BFF;
+}
+
+.box_entity{
+	width:100%;
+	height:auto;
+	border:1px solid #DDDDDD;
+	border-bottom: none;
+	color:#9E9E9E;
+	position: relative;
+}
+
+.subbox_entity{
+	width:100%;
+	border-bottom: 1px solid #DDDDDD;
+	min-height: 40px;
+    line-height: 40px;
+    font-size: 15px;
+    position: relative;
+    cursor: pointer;
+    padding:10px;
+    display: flex;
+}
+
+.entry{
+	display: block;
+}
+
+.entry:hover{
+	background-color: #F8F8F8
+}
+
+.subbox_entity:hover > img{
+	display: block;
+}
+
+
+
+.subbox_entity img{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 10px;
+    margin: auto;
+    display: none;
+}
+
+.value{
+	width:30%;
+	position: relative;
+	margin-right:5%;
+	background-color: transparent;
+
+}
+
+.value_name,.synonym_name{
+	border:none;
+	outline: none;
+    box-shadow:none !important;
+    font-size: 15px;
+    height:auto;
+    background: transparent;
+}
+.synonymns{
+	width:60%;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
+
+.synonym{
+	width:auto;
+	border:1px solid #DDDDDD;
+	padding:5px;
+	position: relative;
+	line-height:30px;
+	height:40px;
+	margin-bottom: 5px;
+	margin-right:5px;
+	cursor: default;
+	color:grey;
+
+}
+
+.synonym:hover{
+	background-color: #F8F8F8;
+}
+
+.synonym:hover > img{
+	display: block;
+	cursor: pointer;
+}
+
+.opaque{
+	opacity: 0;
+}
+
+
+
+.synonym span{
+	margin-right:15px;
+}
+
+.hidden{
+	display: none;
+}
+
+.delete:hover{
+	animation: del 500ms ease-in;
+}
+
+.cancel:hover{
+	animation: del 500ms ease-in;
+}
+
+@keyframes del {
+	0%{
+		transform: rotate(-30deg);
+	}
+
+	20%{
+		transform: rotate(30deg);
+	}
+
+	40%{
+		transform: rotate(-30deg);
+	}
+
+	80%{
+		transform: rotate(30deg);
+	}
+
+	100%{
+		transform: rotate(0deg);
+	}
+}
+}
+
+
+
+
+
+
+
+
+.submit{
+	margin-top:15px;
+	width:10%;
+}
