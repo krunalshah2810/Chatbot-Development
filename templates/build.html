@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>set</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='styles/robot.css')}}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div class="container3">
+      <div class="navheader"><a href="{{url_for('home')}}"><img src="{{url_for('static', filename='Group-2.png')}}" style="width:35px;height:35px;position:relative;left:8px;top:5px"/></a><a style="position:relative;left:20px;top:5px">Chitchat</a><a style="position:relative;left:420px;top:5px">Build Guide</a></div>
+        <div class="nav">
+          <ul class="navcontent">
+            <a href="{{url_for('general')}}"><li>General</li></a>
+            <a href="{{url_for('setup')}}"><li>Setup</li></a>
+            <a href="{{url_for('build')}}"><li>Build</li></a>
+            <a href="{{url_for('test')}}"><li>Test</li></a>
+          </ul>
+      </div>
+      <div class="navrightcontent3">
+        <h1 class="headersetup">Build</h1>
+        <p class="paraclass">When you are done setting up an Actions project and a Dialogflow agent, you can start building your agent. In Dialogflow, intents represent a mapping between what a user says and the corresponding response. You build your intents based on your conversation design, typically creating an intent for each turn (a back and forth exchange between the user and your agent) of the conversation and mapping Actions to specific Dialogflow intents.</p>
+        <h3 class="buildheaderagent">Build dialogs</h3>
+        <p class="paraclass2">To create an intent:</p>
+        <ul class="buildagentclass">1. Click the add sign by the Intents menu item in Dialogflow's left navigation. The Intent Editor appears where you can enter the following information:
+          <li><b>Intent name</b> is the name of the intent that's displayed in the IDE. This name is also used to register intent handlers in your fulfillment code</li>
+          <li><b>User says</b> phrases define what users need to say (the grammar) to trigger the intent. Type a few phrases here (5-10) of what users can say to trigger the intent. Dialogflow automatically handles natural variations of the example phrases you provide.</li>
+          <li><b>Events trigger</b> intents without the need for users to say anything. One example event is the GOOGLE_ASSISTANT_WELCOME event, which allows the Google Assistant to invoke your Action. This event is used for your agent's default, explicit Action.</li>
+          <li><b>Action & parameters</b> defines what to data to pass to fulfillment, if fulfillment is enabled for this intent. This includes data parsed from the user input and the name that you can use in your fulfillment to detect which intent was triggered. You'll use this name later when you create an Action map, which maps an intent its corresponding fulfillment logic.</li>
+          <li><b>Response</b> - The Dialogflow Response Builder lets you define the response to this intent directly within Dialogflow, without calling fulfillment. This feature is useful for responses that are static and don't require fulfillment. You might use this for things such as simple welcome or goodbye messages. However, you will likely use fulfillment to respond to your users for most intents.</li>
+        </ul>
+
+        <ul class="buildagentclass2">2. In the simple response field, enter a phrase to introduce the card.</ul>
+        <div class="buildagentclass2img">
+          <img src="" alt="imgss">
+        </div>
+
+        <p class="afterimg"></p>
+
+
+      </div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	  <link rel="stylesheet" href="{{url_for('static',filename='styles/style.css')}}">
+      <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="crossorigin="anonymous"></script>
+      <script src="{{url_for('static',filename='styles/script.js')}}" charset="utf-8"></script>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+      <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</head>
+<body>
+	<div class="main">
+
+	<div class="logincontent">
+		<h2>You are on your way to increase:</h2>
+		<ul class="contens1">
+			<li>Leads in your funnel</li>
+			<li>Customer Satisfaction</li>
+			<li>Customer Support Availability</li>
+		</ul>
+		<h3>and decrease your:</h3>
+		<ul class="contens2">
+			<li>Customer Churn</li>
+			<li>Customer Query Response Time</li>
+			<li>Customer Case Resolution Time</li>
+		</ul>
+	</div>
+
+
+
+
+	<form class="frm1" method="post">
+		{{form.hidden_tag()}}
+			<h1 style="font-family:Arial">Log In</h1> <a href="{{url_for('register')}}" id="noaccount">No account yet ? Sign Up</a>
+  		<label class="labelemail">Email address</label>
+          <input type="text" class="txt" name="useremail"placeholder="Enter Email">
+      <label class="labelpass">Password</label>
+          <input type="password" class="txt1" name="userpass" placeholder="Enter Password:"/>
+			<a class="loginbtn"><input type="submit" value="  Login" class="btn" /></a>
+			
+
+
+  </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>set</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='styles/robot.css')}}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div class="container3">
+      <div class="navheader"><a href="{{url_for('home')}}"><img src="{{url_for('static', filename='Group-2.png')}}" style="width:35px;height:35px;position:relative;left:8px;top:5px"/></a><a style="position:relative;left:20px;top:5px">Chitchat</a><a style="position:relative;left:420px;top:5px">Setup Guide</a></div>
+        <div class="nav">
+          <ul class="navcontent">
+            <a href="{{url_for('general')}}"><li>General</li></a>
+            <a href="{{url_for('setup')}}"><li>Setup</li></a>
+            <a href="{{url_for('build')}}"><li>Build</li></a>
+            <a href="{{url_for('test')}}"><li>Test</li></a>
+          </ul>
+      </div>
+      <div class="navrightcontent3">
+        <h1 class="headersetup">Setup</h1>
+        <p class="paraclass">To start building conversational Actions with Dialogflow, you'll first need an Actions project, which lets you manage your Actions and a Dialogflow agent, which lets you build and manage your conversational fulfillment.</p>
+        <h2 class="headeragent"> Create a Chitchat Agent</h2>
+        <ul class="agentclass">
+          <li>1. Click Create</li>
+        </ul>
+        <div class="imgagent"><img src="" alt="imag"></div>
+        <p class="afterimg">If the agent creation is successful, the Intents appears. You can now begin customizing how your Dialogflow agent responds <br> to user requests.</p>
+
+
+      </div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Guide</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='styles/robot.css')}}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  </head>
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $(".btnsdark").click(function() {
+     $("html, body").animate({ scrollTop:653}, "slow");
+     return false;
+});
+  });
+  </script>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h3>Chitchat.ai</h3><img src="{{url_for('static', filename='Group-2.png')}}" style="width:50px;height:50px"/>
+      </div>
+        <div class="boxaarea">
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </div>
+        <p class="headline">Getting Started with ChitChat</p>
+        <div class="content">
+          <p>The future of marketing is messaging – and we couldn’t be more excited about building a visual chatbot builder into the <br>core HubSpot platform.
+            With HubSpot’s acquisition of Motion AI, we’re bringing chatbots to the masses<br> and enabling businesses to better engage, convert, close and delight their customers across every channel at scale.</p>
+        </div>
+
+        <img src="{{url_for('static', filename='icons8-scroll-down-50.png')}}"class="btnsdark" style="width:80px;cursor:pointer;height:80px;position:relative;top:180px;left:500px;opacity:0.8">
+      </div>
+
+      <div class="container2">
+        <div class="navheader"><a href="{{url_for('home')}}"><img src="{{url_for('static', filename='Group-2.png')}}" style="width:35px;height:35px;position:relative;left:8px;top:5px"/></a><a style="position:relative;left:20px;top:5px">Chitchat</a><a style="position:relative;left:420px;top:5px">Quick Start Guide</a></div>
+          <div class="nav">
+            <ul class="navcontent">
+              <a href="{{url_for('general')}}"><li>General</li></a>
+              <a href="{{url_for('setup')}}"><li>Setup</li></a>
+              <a href="{{url_for('build')}}"><li>Build</li></a>
+              <a href="{{url_for('test')}}"><li>Test</li></a>
+            </ul>
+        </div>
+        <div class="navrightcontent">
+
+          <h1 class="generalheader">Understanding Intent and Entities</h1>
+          <img src="{{url_for('static', filename='general.png')}}" style="width:700px;height:200px"/>
+          <h2 class="headerintent">Intent</h2>
+          <ul class="listintent">An intent captures the general meaning of a sentence (or an utterance in the chatbots lingo). For example, the sentences below convey the intent of being hungry, let’s call it i_am_hungry:
+            <li>I am hungry</li>
+            <li>I need to eat something</li>
+            <li>I am starving</li>
+            <li>My kingdom for a pizza</li>
+          </ul>
+
+          <h2 class="headerentity">Entity</h2>
+          <ul class="listentity">Entities are knowledge repositories used by the bot to provide personalized and accurate responses. With Entities you can easily extract important information from the ongoing conversation, such as phone number, e-mail address or anything you want. Use them when you want your bot to catch important data.
+
+          </ul>
+
+        </div>
+
+      </div>
+
+  </body>
+</html>

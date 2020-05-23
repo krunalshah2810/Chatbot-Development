@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>set</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='styles/robot.css')}}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div class="container5">
+      <div class="navheader"><a href="{{url_for('home')}}"><img src="{{url_for('static', filename='Group-2.png')}}" style="width:35px;height:35px;position:relative;left:8px;top:5px"/></a><a style="position:relative;left:20px;top:5px">Chitchat</a><a style="position:relative;left:420px;top:5px">Test Guide</a></div>
+        <div class="nav">
+          <ul class="navcontent">
+            <a href="{{url_for('general')}}"><li>General</li></a>
+            <a href="{{url_for('setup')}}"><li>Setup</li></a>
+            <a href="{{url_for('build')}}"><li>Build</li></a>
+            <a href="{{url_for('test')}}"><li>Test</li></a>
+          </ul>
+      </div>
+      <div class="navrightcontent5">
+        <h2 class="buildheaderagent5">Test your Assistant</h2>
+        <p class="paraclass5">Now that you have your Dialogflow agent and fulfillment deployed, you can test out your Action</p>
+        <h3 class="headersetup5">Test and Submit Actions</h3>
+        <p class="testparaclass">To test your Assistant app, click the text box that says "Talk to my test app" and press enter. The Google Assistant hands off the conversation to your app by saying "Okay. Let's get the test version of my test app." Then, your Dialogflow agent's Default Welcome intent will be matched, and the resulting response is sent to the Assistant.</p>
+        <div class="testimg"> </div>
+        <p class="testparaclass2">After the welcome intent is matched, the user's next query is matched against your agent's intents, just like in the Dialogflow simulator. For instance, if you have an intent that captures when a user asks for your agent's name, when asked "What's your name?", the Actions on Google simulator would look like this:</p>
+        <div class="testimg2"> </div>
+
+
+
+
+      </div>
+
+    </div>
+  </body>
+</html>

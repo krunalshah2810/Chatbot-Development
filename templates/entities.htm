@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename = 'enin.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename = 'bot.css') }}">
+
+	<title></title>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+
+	$(function(){
+
+
+		$('.input_text input').keypress(function(e){
+			var ascii = e.which;
+			if (ascii == 13){
+				var text = $(this).val();
+				$(this).attr('value',"");
+				$('.botsays .firstbot').next().text(text);
+				$.post('/chatbot',{
+					message : text
+				},function(message){
+
+					console.log(message);
+					$('.input_text input').val("");
+
+					var json = JSON.parse(message);
+					var response = json['response'];
+					$(".botresp").text(response);
+					var int_name = json['intent']['name'];
+					$(".intentbot").text(int_name)
+
+
+
+
+				})
+			}
+
+		})
+
+
+		$('.sel_project').change(function(){
+            var val = $(this).val();
+            console.log(val);
+            $('.hidden_selected .selval').attr('value',val);
+            $('.hidden_selected .sub').click();
+        })
+
+
+
+
+
+
+    		$(".subbox_entity").dblclick(function(){
+    			id = $(this).attr('data-roll');
+    			$('.submit').attr('value',id).click();
+
+
+
+    		})
+
+    		$(".delete").click(function(e){
+    			e.preventDefault();
+    			index = $(this).parent().attr("data-roll");
+    			$(this).parent().remove();
+    			$.post('/del_entity',{
+                    ent_index : index
+                },function(message){
+                	console.log(message)
+
+                })
+
+    		})
+
+
+
+
+
+    	})
+
+</script>
+
+
+</head>
+<body>
+<div class="nav">
+	<div class="logo">
+		<div class="logos"><img src="{{ url_for('static',filename='Group 2.png') }}"></div>
+		<div class="name">ChitChat</div>
+	</div>
+
+	<form action="{{ url_for('selected') }}" class="hidden_selected" style="display: none" method="post">
+        <input type="submit" class="sub">
+        <input name="sel" class="selval">
+    </form>
+
+	<div class="select">
+	 <select class="form-control sel_project" id="exampleFormControlSelect1">
+		 <option value="none" selected disabled hidden>Select Project</option>
+		{% for pnm in project_names %}
+		<option value={{pnm}}>{{ pnm }}</option>
+		{% endfor %}
+    </select>
+    <a href="#"><img src="https://img.icons8.com/windows/32/868686/settings.png"></a>
+
+	</div>
+	<div class="select"><a href="{{ url_for('welcome') }}" style="text-decoration:none;color:white;"><button type="button" class="btn btn-primary">
+		Create New Agent
+		<img src="https://img.icons8.com/material-outlined/30/ffffff/plus.png" style="left:5px;position: relative">
+	</button></a></div>
+
+	<div class="menus intents">
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/new-message.png" style="margin-right: 10px;">
+		        <a href="{{ url_for('intents') }}">Intents</a>
+		        <a href="{{ url_for('addintent') }}"><img src="https://img.icons8.com/material-outlined/30/868686/plus.png" style="position:absolute;right:15px;top:10px"></a>
+	  </div>
+	</div>
+
+	<div class="menus entities">
+
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/-message-exchange.png" style="margin-right: 10px;">
+		        <a href="{{ url_for('entities') }}">Entities</a>
+		        <a href="{{ url_for('addentity') }}"><img src="https://img.icons8.com/material-outlined/30/868686/plus.png" style="position:absolute;right:15px;top:10px"></a>
+	  </div>
+	</div>
+
+	<div class="menus history">
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/last-12-hours.png" style="margin-right: 10px;">
+		        <a href="#">History</a>
+	  </div>
+	</div>
+
+
+</div>
+
+<div class="main">
+
+	<div class="entity_input">
+		<div class="ename">
+            <img src="https://img.icons8.com/material-outlined/34/868686/-message-exchange.png" style="margin-right: 20px;">
+              Entities</div>
+        <button class="btn btn-primary submit">CREATE ENTITY</button>
+	</div>
+	<!--<div class="box_entity">
+		<div class="subbox_entity" data-roll="0"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+		<div class="subbox_entity" data-roll="1"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+		<div class="subbox_entity" data-roll="2"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+		<div class="subbox_entity" data-roll="3"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+
+	</div>-->
+
+	<form method="post" action="{{ url_for('editentity') }}" class="hidden">
+			<button type="submit" name="id" class="submit"></button>
+	</form>
+
+
+
+<div class="alert alert-secondary alert-dismissible fade show" role="alert">
+  <strong>Note :</strong> Double Click on the entity block to edit!
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+
+	<div class="box_entity">
+		{% if file %}
+
+		{% for key,value in file.items() %}
+		<div class="subbox_entity" data-roll={{ key }}>
+			<span style="margin-left:20px">@{{ value['name'] }}</span>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete">
+		</div>
+		{% endfor %}
+
+		{% endif %}
+
+		<!--
+		<div class="subbox_entity" data-roll=6>
+			<span style="margin-left:20px">@bedroom</span>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete">
+		</div>
+
+
+		<div class="subbox_entity" data-roll=3>
+			<span style="margin-left:20px">@night</span>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete">
+		</div>
+
+		<div class="subbox_entity" data-roll=4>
+			<span style="margin-left:20px">@day</span>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete">
+		</div>
+
+		<div class="subbox_entity" data-roll=18>
+			<span style="margin-left:20px">@afternoon</span>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete">
+		</div>
+	-->
+
+	</div>
+	<br><br>
+
+
+
+</div>
+
+<div class="bot">
+	<div class="bothead">
+
+        <div class="input_text"><input type="text" placeholder="Try it now"></div>
+        <div class="speak"><img src="https://img.icons8.com/material-rounded/26/868686/microphone.png"></div>
+    </div>
+
+    <div class="botsays com">
+        <div class="firstbot">USER SAYS</div>
+        <div>Hii</div>
+    </div>
+
+    <div class="botresponse com">
+        <br>
+        <div class="firstbot" style="display: flex;margin-right: 40px;position: relative;">
+            <div style="width:20px;height:20px;position: relative;margin-right:10px;">
+                <img src="{{ url_for('static',filename = 'Group 2.png') }}" style="position: absolute;width:100%;height:100%">
+            </div>
+            <div style="width:200px;">CHITCHAT RESPONSE</div>
+        </div>
+        <div class="botresp">Hi! i am arko, welcome to my world</div>
+        <br>
+        <br>
+    </div>
+
+    <div class="botintent com">
+        <br>
+        <div class="firstbot">INTENT</div>
+        <div class="intentbot" style="color:#007BFF">WELCOME</div>
+        <br>
+    </div>
+    <BR>
+    <BR>
+
+    <div class="botlast">
+        <center style="cursor: pointer;">DIAGNOSTIC INFO</center>
+    </div>
+
+
+</div>
+
+</body>
+</html>

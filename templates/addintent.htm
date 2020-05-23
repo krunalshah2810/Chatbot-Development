@@ -1,0 +1,1395 @@
+<html>
+<head>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename = 'addin.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename = 'bot.css') }}">
+	<title></title>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+
+	$(function(){
+
+        $('.input_text input').keypress(function(e){
+            var ascii = e.which;
+            if (ascii == 13){
+                var text = $(this).val();
+                $(this).attr('value',"");
+                $('.botsays .firstbot').next().text(text);
+                $.post('/chatbot',{
+                    message : text
+                },function(message){
+
+                    console.log(message);
+                    $('.input_text input').val("");
+
+                    var json = JSON.parse(message);
+                    var response = json['response'];
+                    $(".botresp").text(response);
+                    var int_name = json['intent']['name'];
+                    $(".intentbot").text(int_name)
+
+
+
+
+                })
+            }
+
+        })
+
+        $('.sel_project').change(function(){
+            var val = $(this).val();
+            console.log(val);
+            $('.hidden_selected .selval').attr('value',val);
+            $('.hidden_selected .sub').click();
+        })
+
+		var counter1 = 0;
+        var normal_text = [];
+    	var span_text = [[]];
+        var parameter = [[]];
+        var entity = [[]];
+        var entity_name = [[]];
+        var required={};
+
+        var counter2 = 1;
+        var parameters_main = [''];
+        var entity_name_main = [''];
+        var prompt = [[]];
+
+        var color = {{ color_sel|safe }};
+        console.log(color)
+        var actions = {{ actions|safe }};
+        console.log(actions)
+       // var entities = {{ entities|safe }};
+       // console.log(entities)
+
+       var diff_colors=['#FFFF66','#FFB266','#99FF99','#99FFFF','#99CCFF','#9999FF','#CC99FF','#FF99FF','#E0E0E0'];
+
+       var lenu = 0;
+       var prompt_number = 0;
+
+
+       var main_resp_count = 1;
+       var responses = [[]];
+
+       var seperation = 0;
+
+       //////////////////////////////////////////////////////////////
+
+
+
+        $('.add_phrase').click(function(){
+
+            counter1 = counter1 + 1;
+            $('.box_entity').append('<div class="subbox_entity" data-roll='+counter1+'><div class="quote quote23"><center><img src="https://img.icons8.com/ios-filled/20/808080/quote-right.png"></center></div><div class="query_container"><input type="text" class="query" placeholder="Add user expression"></div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete"></div><div class="phrase_tab"><table style="width:100%" class="intent_ent"><tr><th>Parameter name</th><th>Entity</th><th>Resolved value</th></tr></table>');
+
+
+
+            $('.query').keypress(function(e){
+            ascii = e.which;
+            if (ascii == 13){
+                e.preventDefault();
+                id = $(this).parent().parent().attr('data-roll');
+                phrase = $(this).val();
+                console.log(phrase);
+                console.log(id);
+                normal_text[id] = phrase;
+                $(this).remove();
+                $.post('entity_find',{
+                    message : phrase,
+                    index : id,
+                    color : JSON.stringify([color]),
+                    actions : JSON.stringify([actions])
+
+
+
+                },function(message){
+                    console.log(message);
+                    var resp = JSON.parse(message);
+                    console.log(resp)
+                    var p = resp['parameter'];
+                    var e_n = resp['entity_name'];
+                    var e = resp['entity'];
+                    color = resp['color_sel'];
+                    var s = resp['sentence'];
+                    var i = resp['index'];
+
+
+                    span_text[i] = s;
+                    parameter[i] = p;
+                    entity[i] = e;
+                    entity_name[i] = e_n;
+
+                    console.log(span_text);
+                    console.log(parameter);
+                    console.log(entity);
+                    console.log(entity_name);
+
+                    actions = resp['actions'];
+                    var action_update = resp['action_update'];
+                    console.log(actions);
+                    selection = $('.subbox_entity[data-roll ='+i+' ]');
+                    selection.children('.query_container').html(s);
+                    selection.next().css('display','block');
+
+                    for (var q=0;q<e.length;q++){
+                        selection.next().children('.intent_ent').append("<tr><td>"+p[q]+"</td><td><span style='background-color:"+color[p[q]]+"'>"+e_n[q]+"</td><td>"+e[q]+"</td></tr>");
+                    }
+
+
+
+
+                    for(var key in action_update){
+                        var val = actions[key];
+                        parameters_main[counter2]=key;
+                        entity_name_main[counter2] = val;
+                        prompt[counter2] = [];
+                        console.log(parameters_main);
+                        console.log(entity_name_main);
+
+                        $('.intent_param').append('<tr data-roll='+counter2+'><td><input type="checkbox" name="" class="required" value="yes" disabled=True></td><td><input type="text" class="parameter" disabled placeholder="Enter Name" value='+key+'></td><td><div class="entity_select"><span style="background-color:'+color[key]+'">'+val+'</div></td><td>$'+key+'</td><td><span class="prompt">+ Add Prompt</span></td></tr>');
+                        counter2 = counter2 + 1;
+                        console.log("#"+counter2);
+                    }
+
+                    /*$('.parameter').keyup(function(e){
+
+                        if (e.keyCode == 8){
+                            $(this).val($(this).val().substring(0,$(this).val().length));
+
+                        }
+                        var val = $(this).val()+String.fromCharCode();
+                        $(this).parent().next().next().text('$'+val);
+                        var i = $(this).parent().parent().attr('data-roll')
+                        parameters_main[i] = val;
+                        console.log(parameters_main);
+
+                    })*/
+
+
+                    var fade = 0;
+                    console.log(fade);
+
+                    $('.subbox_entity .quote').click(function(){
+                        if (fade==0){
+                          $(this).parent().next().fadeIn();
+                          fade = 1;
+                          console.log(fade);
+                        }else{
+                            $(this).parent().next().fadeOut();
+                            fade = 0;
+                            console.log(fade);
+                        }
+                   });
+
+                     $('.subbox_entity .delete').click(function(){
+                            var index_remove = $(this).parent().attr('data-roll');
+                            $(this).parent().next().remove();
+                            $(this).parent().remove();
+                            parameter[index_remove] = [];
+                            entity_name[index_remove] = [];
+                            entity[index_remove] = [];
+                            span_text[index_remove] = "";
+                            normal_text[index_remove] ="";
+                    });
+
+
+                     $('.prompt').click(function(){
+
+            var i = $(this).parent().parent().attr('data-roll');
+            console.log(i);
+            prompt_number = i;
+            prompt[i] = prompt[i].filter(function(item){
+                return item != "";
+            });
+
+            console.log(prompt[i]);
+            var len = prompt[i].length;
+            console.log(len)
+            $('.prompt_head').html('<h5>Prompts for "'+parameters_main[i]+'"</h5>')
+            $('.namu span').text(parameters_main[i]);
+            $('.entutu span').text(entity_name_main[i]);
+            $('.valu span').text('$'+parameters_main[i]);
+            $('.prompts').empty();
+            $('.prompts').append('<div class="prompts_in"><div class="resp_logo"></div><div style="align-self: center;color: #868686">PROMPTS</div></div>');
+            for (var q=0;q<len;q++){
+                $('.prompts').append('<div class="prompts_in" data-roll='+q+'><div class="resp_logo">:</div><div class="orig_prompt">'+prompt[i][q]+'</div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>');
+                console.log(prompt[i][q]);
+
+
+
+            }
+
+            $('.prompts').append('<div class="prompts_in" data-roll='+len+'><div class="resp_logo">:</div><input type="text" class="orig_prompt" placeholder="Enter a prompt variant"><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>')
+
+            $('.black_screen').fadeIn(300,function(){
+                $('.prompt_block').fadeIn(400);
+            })
+
+            lenu =len;
+
+            $('.orig_prompt').keypress(function(e){
+                var ascii = e.which;
+                if (ascii == 13){
+                    var specific_index = $(this).parent().attr('data-roll');
+                    var text = $(this).val();
+                    $(this).parent().append('<div class="orig_prompt2">'+text+'</div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt">');
+                    prompt[i][specific_index] = text;
+                    console.log(prompt);
+                    $(this).next().remove();
+                    $(this).remove();
+
+                    $('.delete_prompt').click(function(){
+                        var index = $(this).parent().attr('data-roll');
+                        prompt[prompt_number][index] = "";
+                        console.log(prompt);
+                        $(this).parent().remove();
+
+                    });
+
+                    $('.magic').click();
+                    //len = len+1;
+                    //$('.prompts').append('<div class="prompts_in" data-roll='+len+'><div class="resp_logo">:</div><input type="text" class="orig_prompt" placeholder="Enter a prompt variant"><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>')
+                }
+            })
+
+        })
+
+
+
+
+                    $('.add_phrase').click();
+
+                })
+
+            }else{
+                val = $(this).text();
+            }
+        })
+
+
+        })
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        $('.query').keypress(function(e){
+            ascii = e.which;
+            if (ascii == 13){
+                e.preventDefault();
+
+                id = $(this).parent().parent().attr('data-roll');
+                phrase = $(this).val();
+                console.log(phrase);
+                console.log(id);
+                normal_text[id] = phrase;
+                $(this).remove();
+                $.post('entity_find',{
+                    message : phrase,
+                    index : id,
+                    color : JSON.stringify([color]),
+                    actions : JSON.stringify([actions])
+
+
+
+                },function(message){
+                    console.log(message);
+                    var resp = JSON.parse(message);
+                    console.log(resp)
+                    var p = resp['parameter'];
+                    var e_n = resp['entity_name'];
+                    var e = resp['entity'];
+                    color = resp['color_sel'];
+                    var s = resp['sentence'];
+                    var i = resp['index'];
+
+                    span_text[i] = s;
+                    parameter[i] = p;
+                    entity[i] = e;
+                    entity_name[i] = e_n;
+
+                    console.log(span_text);
+                    console.log(parameter);
+                    console.log(entity);
+                    console.log(entity_name);
+
+                    actions = resp['actions'];
+                    var action_update = resp['action_update'];
+                    console.log(actions);
+                    selection = $('.subbox_entity[data-roll ='+i+' ]');
+                    selection.children('.query_container').html(s);
+                    selection.next().css('display','block');
+
+                    for (var q=0;q<e.length;q++){
+                        selection.next().children('.intent_ent').append("<tr><td>"+p[q]+"</td><td><span style='background-color:"+color[p[q]]+"'>"+e_n[q]+"</td><td>"+e[q]+"</td></tr>");
+                    }
+
+
+
+
+                    for(var key in action_update){
+                        var val = actions[key];
+                        parameters_main[counter2]=key;
+                        entity_name_main[counter2] = val;
+                        prompt[counter2] = [];
+
+                        $('.intent_param').append('<tr data-roll='+counter2+'><td><input type="checkbox" name="" class="required" value="yes" disabled=True></td><td><input type="text" class="parameter" disabled placeholder="Enter Name" value='+key+'></td><td><div class="entity_select"><span style="background-color:'+color[key]+'">'+val+'</div></td><td>$'+key+'</td><td><span class="prompt">+ Add Prompt</span></td></tr>');
+                        counter2 = counter2 + 1;
+                        console.log("#"+counter2);
+                    }
+
+                    $('.required').click(function(){
+
+                        var arr = [];
+                        var index = $(this).parent().parent().attr('data-roll');
+                        arr.push(parameters_main[index]);
+                        arr.push(entity_name_main[index]);
+                        arr.push(prompt[index]);
+                        if ($(this).prop('checked') == true){
+                            required[index] = arr;
+                            console.log(required);
+                        }else if ($(this).prop('checked') == false){
+                            delete required[index];
+                            console.log(required);
+                        }
+            })
+
+
+
+
+                    $('.prompt').click(function(){
+
+                        var i = $(this).parent().parent().attr('data-roll');
+                        console.log(i);
+                        prompt_number = i;
+                        prompt[i] = prompt[i].filter(function(item){
+                            return item != "";
+                        });
+
+                        console.log(prompt[i]);
+                        var len = prompt[i].length;
+                        console.log(len)
+                        $('.prompt_head').html('<h5>Prompts for "'+parameters_main[i]+'"</h5>')
+                        $('.namu span').text(parameters_main[i]);
+                        $('.entutu span').text(entity_name_main[i]);
+                        $('.valu span').text('$'+parameters_main[i]);
+                        $('.prompts').empty();
+                        $('.prompts').append('<div class="prompts_in"><div class="resp_logo"></div><div style="align-self: center;color: #868686">PROMPTS</div></div>');
+                        for (var q=0;q<len;q++){
+                            $('.prompts').append('<div class="prompts_in" data-roll='+q+'><div class="resp_logo">:</div><div class="orig_prompt">'+prompt[i][q]+'</div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>');
+                            console.log(prompt[i][q]);
+
+                        }
+
+                        $('.prompts').append('<div class="prompts_in" data-roll='+len+'><div class="resp_logo">:</div><input type="text" class="orig_prompt" placeholder="Enter a prompt variant"><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>')
+
+                        $('.black_screen').fadeIn(300,function(){
+                                  $('.prompt_block').fadeIn(400);
+                        })
+
+                        $('.delete_prompt').click(function(){
+                                var index = $(this).parent().attr('data-roll');
+                                prompt[prompt_number][index] = "";
+                                console.log(prompt);
+                                $(this).parent().remove();
+
+                        });
+
+                        lenu =len;
+
+                        $('.orig_prompt').keypress(function(e){
+                            var ascii = e.which;
+                            if (ascii == 13){
+                                var specific_index = $(this).parent().attr('data-roll');
+                                var text = $(this).val();
+                                $(this).parent().append('<div class="orig_prompt2">'+text+'</div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt">');
+                                prompt[i][specific_index] = text;
+                                console.log(prompt);
+                                $(this).next().remove();
+                                $(this).remove();
+
+                                $('.delete_prompt').click(function(){
+                                    var index = $(this).parent().attr('data-roll');
+                                    prompt[prompt_number][index] = "";
+                                    console.log(prompt);
+                                    $(this).parent().remove();
+
+                                });
+
+                                $('.magic').click();
+                    //len = len+1;
+                    //$('.prompts').append('<div class="prompts_in" data-roll='+len+'><div class="resp_logo">:</div><input type="text" class="orig_prompt" placeholder="Enter a prompt variant"><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>')
+                }
+            })
+
+        })
+
+                    $('.parameter').keyup(function(e){
+
+                        if (e.keyCode == 8){
+                            $(this).val($(this).val().substring(0,$(this).val().length));
+
+                        }
+                        var val = $(this).val()+String.fromCharCode();
+                        $(this).parent().next().next().text('$'+val);
+                        var i = $(this).parent().parent().attr('data-roll')
+                        parameters_main[i] = val;
+                        console.log(parameters_main)
+
+                    })
+
+                    /////////////////////PROOOOOOOOOOOOOOOOOMMMPTTTTTTTTTTTTT
+
+
+                    $('.add_phrase').click();
+
+
+
+
+
+                })
+
+            }else{
+                val = $(this).text();
+            }
+        })
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+
+       $('.subbox_entity .quote').click(function(){
+
+              $(this).parent().next().fadeToggle();
+        })
+
+       /////////////////////////////////////////////////////////////////////////////////////
+
+        var down = 0;
+
+        $('.hedohed,.down').click(function(){
+
+            if (down == 0){
+                $(this).siblings('.subbox_entity,.add,.add_resp,.subbbox_entity,.phrase_tab,.tab').fadeOut();
+                down =1;
+            } else{
+                $(this).siblings('.subbox_entity,.add,.add_resp,.subbbox_entity,.tab').fadeIn();
+                down =0;
+
+            }
+
+
+        })
+        ///////////////////////////////////////////////////////////////////////////
+
+
+
+        ///////////////////////////////////////////////////////////////////////////
+
+        $('.subbox_entity .delete').click(function(){
+            var index_remove = $(this).parent().attr('data-roll');
+            $(this).parent().next().remove();
+            $(this).parent().remove();
+            parameter[index_remove] = [];
+            entity_name[index_remove] = [];
+            entity[index_remove] = [];
+            span_text[index_remove] = "";
+            normal_text[index_remove] ="";
+
+        })
+        ////////////////////////////////////////////////////////////////////
+
+        $('.parameter').keyup(function(e){
+
+            if (e.keyCode == 8){
+                $(this).val($(this).val().substring(0,$(this).val().length));
+
+            }
+            var val = $(this).val()+String.fromCharCode();
+            $(this).parent().next().next().text('$'+val);
+            var i = $(this).parent().parent().attr('data-roll');
+            parameters_main[i] = val;
+            console.log(parameters_main);
+            console.log(entity_name_main);
+            console.log(prompt);
+            prompt[prompt_number].push("~");
+            if ((parameters_main[prompt_number] != "") && (entity_name_main[prompt_number] != "") && (prompt[prompt_number][0] != "~")){
+                $(this).parent().prev().children().attr('disabled',false);
+            }else{
+                $(this).parent().prev().children().attr('disabled',true);
+            }
+
+            prompt[prompt_number] = prompt[prompt_number].filter(function(item){
+                return item != "~";
+            })
+
+        })
+
+        /////////////////////////////////////////////////////////////////
+
+        $('.entity_select select').change(function(){
+            var val = $(this).val();
+            var i = $(this).parent().parent().parent().attr('data-roll');
+            entity_name_main[i] = val;
+            console.log(parameters_main);
+            console.log(entity_name_main);
+            console.log(prompt);
+            prompt[prompt_number].push("~");
+            if ((parameters_main[prompt_number] != "") && (entity_name_main[prompt_number] != "") && (prompt[prompt_number][0] != "~")){
+                $(this).parent().parent().prev().prev().children().attr('disabled',false);
+            }else{
+                $(this).parent().parent().prev().prev().children().attr('disabled',true);
+            }
+
+            prompt[prompt_number] = prompt[prompt_number].filter(function(item){
+                return item != "~";
+            })
+
+        })
+
+        ////////////////////////////////////////////////////
+
+
+
+
+        $('.prompt').click(function(){
+
+            var i = $(this).parent().parent().attr('data-roll');
+            console.log(i);
+            prompt_number = i;
+            prompt[i] = prompt[i].filter(function(item){
+                return item != "";
+            });
+
+            console.log(prompt[i]);
+            var len = prompt[i].length;
+            console.log(len)
+            $('.prompt_head').html('<h5>Prompts for "'+parameters_main[i]+'"</h5>')
+            $('.namu span').text(parameters_main[i]);
+            $('.entutu span').text(entity_name_main[i]);
+            $('.valu span').text('$'+parameters_main[i]);
+            $('.prompts').empty();
+            $('.prompts').append('<div class="prompts_in"><div class="resp_logo"></div><div style="align-self: center;color: #868686">PROMPTS</div></div>');
+            for (var q=0;q<len;q++){
+                $('.prompts').append('<div class="prompts_in" data-roll='+q+'><div class="resp_logo">:</div><div class="orig_prompt">'+prompt[i][q]+'</div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>');
+                console.log(prompt[i][q]);
+
+
+
+            }
+
+            $('.delete_prompt').click(function(){
+                        var index = $(this).parent().attr('data-roll');
+                        prompt[prompt_number][index] = "";
+                        console.log(prompt);
+                        $(this).parent().remove();
+
+                    });
+
+            $('.prompts').append('<div class="prompts_in" data-roll='+len+'><div class="resp_logo">:</div><input type="text" class="orig_prompt" placeholder="Enter a prompt variant"><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>')
+
+            $('.black_screen').fadeIn(300,function(){
+                $('.prompt_block').fadeIn(400);
+            })
+
+            lenu =len;
+
+            $('.orig_prompt').keypress(function(e){
+                var ascii = e.which;
+                if (ascii == 13){
+                    var specific_index = $(this).parent().attr('data-roll');
+                    var text = $(this).val();
+                    $(this).parent().append('<div class="orig_prompt2">'+text+'</div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt">');
+                    prompt[i][specific_index] = text;
+                    console.log(prompt);
+                    $(this).next().remove();
+                    $(this).remove();
+
+                    $('.delete_prompt').click(function(){
+                        var index = $(this).parent().attr('data-roll');
+                        prompt[prompt_number][index] = "";
+                        console.log(prompt);
+                        $(this).parent().remove();
+
+                    });
+
+                    $('.magic').click();
+                    //len = len+1;
+                    //$('.prompts').append('<div class="prompts_in" data-roll='+len+'><div class="resp_logo">:</div><input type="text" class="orig_prompt" placeholder="Enter a prompt variant"><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>')
+                }
+            })
+
+        })
+
+        ///////////////////////////////////////////////////////////////////
+
+         $('.close_propmt').click(function(){
+            $('.black_screen,.prompt_block').fadeOut(500);
+            console.log(prompt_number);
+            console.log(parameters_main);
+            console.log(entity_name_main);
+            console.log(prompt);
+            prompt[prompt_number].push("~");
+            prompt[prompt_number] = prompt[prompt_number].filter(function(item){
+                return item != "";
+            })
+            if ((parameters_main[prompt_number] != "") && (entity_name_main[prompt_number] != "") && (prompt[prompt_number][0] != "~")){
+                console.log("false");
+                $('tr[data-roll='+prompt_number+']').children().children('.required').attr('disabled',false);
+            }else{
+                console.log("true");
+                $('tr[data-roll='+prompt_number+']').children().children('.required').attr('disabled',true);
+            }
+            prompt[prompt_number] = prompt[prompt_number].filter(function(item){
+                return item != "~";
+            })
+        })
+
+         /////////////////////////////////////////////////////////////////
+
+        $('.magic').click(function(){
+            lenu = lenu +1;
+            $('.prompts').append('<div class="prompts_in" data-roll='+lenu+'><div class="resp_logo">:</div><input type="text" class="orig_prompt" placeholder="Enter a prompt variant"><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>');
+
+            $('.orig_prompt').keypress(function(e){
+                var ascii = e.which;
+                if (ascii == 13){
+                    var specific_index = $(this).parent().attr('data-roll');
+                    var text = $(this).val();
+                    $(this).parent().append('<div class="orig_prompt2">'+text+'</div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt">');
+                    prompt[prompt_number][specific_index] = text;
+                    console.log(prompt);
+                    $(this).next().remove();
+                    $(this).remove();
+                    $('.delete_prompt').click(function(){
+                        var index = $(this).parent().attr('data-roll');
+                        prompt[prompt_number][index] = "";
+                        console.log(prompt);
+                        $(this).parent().remove();
+
+                    });
+                    $('.magic').click();
+                    //len = len+1;
+                    //$('.prompts').append('<div class="prompts_in" data-roll='+len+'><div class="resp_logo">:</div><input type="text" class="orig_prompt" placeholder="Enter a prompt variant"><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>')
+                }
+            })
+
+
+
+        })
+
+
+
+        ////////////////////////////////////////////////////////////////
+
+
+
+        $('.box_entity2 .add').click(function(){
+
+            parameters_main[counter2] = "";
+            entity_name_main[counter2] = "";
+            prompt[counter2] = [];
+
+            console.log(parameters_main);
+            console.log(entity_name_main);
+            console.log(prompt);
+            $('.intent_param').append('<tr data-roll='+counter2+'><td><input type="checkbox" name="" class="required" value="yes" disabled=True></td><td><input type="text" class="parameter" placeholder="Enter Name"></td><td><div class="entity_select"><select><option value="none" selected disabled hidden>Select Entity</option>{% for entity in entities %}<option value={{ "@"+entity }}>{{ "@"+entity }}</option>{% endfor %}</select></div></td><td>$diggaj</td><td><span class="prompt">+ Add Prompt</span></td></tr>');
+            counter2 = counter2 + 1;
+            console.log("helllo");
+
+        $('.required').click(function(){
+                var arr = [];
+                var index = $(this).parent().parent().attr('data-roll');
+                arr.push(parameters_main[index]);
+                arr.push(entity_name_main[index]);
+                arr.push(prompt[index]);
+                if ($(this).prop('checked') == true){
+                    required[index] = arr;
+                    console.log(required);
+                }else if ($(this).prop('checked') == false){
+                    delete required[index];
+                    console.log(required);
+                }
+            })
+
+
+        $('.prompt').click(function(){
+
+            var i = $(this).parent().parent().attr('data-roll');
+            console.log(i);
+            prompt_number = i;
+            prompt[i] = prompt[i].filter(function(item){
+                return item != "";
+            });
+
+            console.log(prompt[i]);
+            var len = prompt[i].length;
+            console.log(len)
+            $('.prompt_head').html('<h5>Prompts for "'+parameters_main[i]+'"</h5>')
+            $('.namu span').text(parameters_main[i]);
+            $('.entutu span').text(entity_name_main[i]);
+            $('.valu span').text('$'+parameters_main[i]);
+            $('.prompts').empty();
+            $('.prompts').append('<div class="prompts_in"><div class="resp_logo"></div><div style="align-self: center;color: #868686">PROMPTS</div></div>');
+            for (var q=0;q<len;q++){
+                $('.prompts').append('<div class="prompts_in" data-roll='+q+'><div class="resp_logo">:</div><div class="orig_prompt">'+prompt[i][q]+'</div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>');
+                console.log(prompt[i][q]);
+
+
+
+            }
+
+            $('.prompts').append('<div class="prompts_in" data-roll='+len+'><div class="resp_logo">:</div><input type="text" class="orig_prompt" placeholder="Enter a prompt variant"><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>')
+
+            $('.black_screen').fadeIn(300,function(){
+                $('.prompt_block').fadeIn(400);
+            })
+
+            lenu =len;
+
+            $('.orig_prompt').keypress(function(e){
+                var ascii = e.which;
+                if (ascii == 13){
+                    var specific_index = $(this).parent().attr('data-roll');
+                    var text = $(this).val();
+                    $(this).parent().append('<div class="orig_prompt2">'+text+'</div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt">');
+                    prompt[i][specific_index] = text;
+                    console.log(prompt);
+                    $(this).next().remove();
+                    $(this).remove();
+
+                    $('.delete_prompt').click(function(){
+                        var index = $(this).parent().attr('data-roll');
+                        prompt[prompt_number][index] = "";
+                        console.log(prompt);
+                        $(this).parent().remove();
+
+                    });
+
+                    $('.magic').click();
+                    //len = len+1;
+                    //$('.prompts').append('<div class="prompts_in" data-roll='+len+'><div class="resp_logo">:</div><input type="text" class="orig_prompt" placeholder="Enter a prompt variant"><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_prompt"></div>')
+                }
+            })
+
+        })
+
+        /////////////changedddddd
+
+
+            $('.parameter').keyup(function(e){
+
+            if (e.keyCode == 8){
+                $(this).val($(this).val().substring(0,$(this).val().length));
+
+            }
+            var val = $(this).val()+String.fromCharCode();
+            $(this).parent().next().next().text('$'+val);
+            var i = $(this).parent().parent().attr('data-roll');
+            parameters_main[i] = val;
+            console.log(parameters_main);
+            console.log(entity_name_main);
+            console.log(prompt);
+            prompt[prompt_number].push("~");
+            if ((parameters_main[prompt_number] != "") && (entity_name_main[prompt_number] != "") && (prompt[prompt_number][0] != "~")){
+                $(this).parent().prev().children().attr('disabled',false);
+            }else{
+                $(this).parent().prev().children().attr('disabled',true);
+            }
+
+            prompt[prompt_number] = prompt[prompt_number].filter(function(item){
+                return item != "~";
+            })
+
+        })
+
+            $('.delete_prompt').click(function(){
+                        var index = $(this).parent().attr('data-roll');
+                        prompt[prompt_number][index] = "";
+                        console.log(prompt);
+                        $(this).parent().remove();
+
+                    });
+
+        $('.entity_select select').change(function(){
+            var val = $(this).val();
+            var i = $(this).parent().parent().parent().attr('data-roll');
+            entity_name_main[i] = val;
+            console.log(parameters_main);
+            console.log(entity_name_main);
+            console.log(prompt);
+            prompt[prompt_number].push("~");
+            if ((parameters_main[prompt_number] != "") && (entity_name_main[prompt_number] != "") && (prompt[prompt_number][0] != "~")){
+                $(this).parent().parent().prev().prev().children().attr('disabled',false);
+            }else{
+                $(this).parent().parent().prev().prev().children().attr('disabled',true);
+            }
+            prompt[prompt_number] = prompt[prompt_number].filter(function(item){
+                return item != "~";
+            })
+
+
+        })
+
+
+    })
+
+
+
+
+
+        ///////////////////////////////////////////////////////////////////
+
+
+        $(".submit").click(function(){
+            intent_name = $(".ename").val();
+            if ((intent_name == "") || (intent_name == " ")){
+                $(".entity_input").append('<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Warning :</strong> Please enter Intent name.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+            }else{
+                $.post("/send_intent",{
+                    intent_name : intent_name,
+                    normal_text : JSON.stringify(normal_text),
+                    span_text : JSON.stringify(span_text),
+                    parameter : JSON.stringify(parameter),
+                    entity : JSON.stringify(entity),
+                    entity_name : JSON.stringify(entity_name),
+                    required : JSON.stringify(required),
+                    parameters_main : JSON.stringify(parameters_main),
+                    entity_name_main :JSON.stringify(entity_name_main),
+                    prompt : JSON.stringify(prompt),
+                    color : JSON.stringify(color),
+                    responses : JSON.stringify(responses),
+                    actions : JSON.stringify(actions)
+                },function(message){
+                    $(".entity_input").append(message);
+                })
+            }
+        })
+
+        ////////////////////////////////////////////////////////////////////////////////////
+
+
+    		$(".ename").keypress(function(e){
+    			ascii = e.which;
+    			console.log(ascii);
+    			prev = $(this).val();
+    			latest = prev + String.fromCharCode(ascii);
+    			if ((ascii > 64 && ascii < 91) || (ascii == 45) || (ascii == 95) || (ascii > 96 && ascii < 123) || (ascii > 47 && ascii < 58)){
+    				$(".ename").css("border-color","#007BFF");
+    				console.log("Good to go!");
+
+    			}else{
+    				e.preventDefault();
+    				$(".ename").css("border-color","#93751C");
+    				$(".alert").remove();
+    				$(".entity_input br").remove();
+    				$(".entity_input").append('<br><br><div class="alert alert-warning alert-dismissible fade show" role="alert"><strong>Note :</strong> Entity name can contain only the following: A-Z, a-z, 0-9, _ (underscore), - (dash).<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+    			}
+    		});
+
+            //////////////////////////////////////////////////////////////////////
+
+            var resp_count = 0;
+
+            $('.orig_response').keypress(function(e){
+                ascii = e.which;
+                if (ascii==13){
+                    var val = $(this).val();
+                    var index = $(this).parent().parent().attr('data-roll');
+                    console.log('+++'+index);
+                    resp_count = index;
+                    $(this).attr('disabled',true );
+                    responses[index].push(val);
+                    console.log(responses);
+                    $('.resp_add').click();
+                    //$('.responses').append('<div class="response"><div class="resp_logo">:)</div><input type="text" class="orig_response" placeholder="Enter a text response"><img src="https://img.icons8.com/material/18/868686/delete-forever--v2.png" class="delete_resp"></div>');
+                }
+            })
+            /////////////////////////////////////////////////////////
+
+            $('.resp_add').click(function(){
+
+                $('.responses[data-roll='+resp_count+']').append('<div class="response"><div class="resp_logo">:)</div><input type="text" class="orig_response" placeholder="Enter a text response"><img src="https://img.icons8.com/material/18/868686/delete-forever--v2.png" class="delete_resp"></div>');
+
+
+            $('.delete_resp').click(function(){
+
+                var val = $(this).siblings('.orig_response').val();
+
+                var index = $(this).parent().parent().attr('data-roll');
+                responses[index] = responses[index].filter(function(item){
+                    return item != val;
+                });
+
+
+                console.log(responses[index]);
+                $(this).parent().remove();
+            })
+
+                $('.orig_response').keypress(function(e){
+                ascii = e.which;
+                if (ascii==13){
+                    var val = $(this).val();
+                    var index = $(this).parent().parent().attr('data-roll');
+                    console.log('&&&'+index);
+                    $(this).attr('disabled',true );
+                    resp_count = index;
+                    responses[index].push(val);
+                    console.log(responses);
+                    $('.resp_add').click();
+                }
+            })
+
+
+            })
+
+
+            ////////////////////////////////////////////////////
+
+            $('.delete_whole_resp').click(function(){
+                var index = $(this).parent().parent().attr('data-roll');
+                responses[index] = [];
+                console.log(responses);
+                $(this).parent().parent().remove();
+            })
+
+            /////////////////////////////////////////////////////////////////
+
+            $('.delete_resp').click(function(){
+
+                var i = parseInt($(this).parent().parent().attr('data-roll'));
+                var v = $(this).siblings('.orig_response').val();
+                console.log(i);
+                console.log(v);
+                console.log(responses);
+                responses[i] = responses[i].filter(function(item){
+                    return item != v;
+                })
+                console.log(responses);
+                $(this).parent().remove();
+
+
+            })
+/////////////////////////////////////////changedddddddddddddddddddddddddddddddddddddddddddddddd
+
+          /*  $('.delete_resp').click(function(){
+
+                var i = parseInt($(this).parent().parent().attr('data-roll'));
+                var v = $(this).siblings('.orig_response').val();
+                console.log(i);
+
+                console.log(v);
+                console.log(responses);
+                responses[i] = responses[i].filter(function(item){
+                    return item != v;
+                })
+
+                console.log(responses);
+                $(this).parent().remove();
+
+
+            })*/
+
+            //////////////////////////////////////////////////////////
+
+
+
+
+
+            $('.add_resp').click(function(){
+                seperation = seperation +1;
+                responses[seperation] = [];
+                $('.tab').append('<div class="responses" data-roll='+seperation+'><div class="head_resp">Text Responses<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_whole_resp"></div><div class="response"><div class="resp_logo">:)</div><input type="text" class="orig_response2" placeholder="Enter a text response"><img src="https://img.icons8.com/material/18/868686/delete-forever--v2.png" class="delete_resp2"></div></div>');
+
+                $('.orig_response2').keypress(function(e){
+                ascii = e.which;
+                if (ascii==13){
+                    var val = $(this).val();
+                    var index = $(this).parent().parent().attr('data-roll');
+                    console.log('---------'+index);
+                    resp_count = index;
+                    $(this).attr('disabled',true);
+                    responses[index].push(val);
+                    console.log(responses);
+                    $('.resp_add2').click();
+
+                }
+            })
+
+                $('.delete_whole_resp').click(function(){
+                var index = $(this).parent().parent().attr('data-roll');
+                responses[index] = [];
+                console.log(responses);
+                $(this).parent().parent().remove();
+            })
+
+                $('.delete_resp2').click(function(){
+
+                var i = parseInt($(this).parent().parent().attr('data-roll'));
+                var v = $(this).siblings('.orig_response2').val();
+                console.log(i);
+                console.log(v);
+                console.log(responses);
+                responses[i] = responses[i].filter(function(item){
+                    return item != v;
+                })
+                console.log(responses);
+                $(this).parent().remove();
+
+            })
+
+
+
+
+                $('.resp_add2').click(function(){
+
+                $('.responses[data-roll='+resp_count+']').append('<div class="response"><div class="resp_logo">:)</div><input type="text" class="orig_response2" placeholder="Enter a text response"><img src="https://img.icons8.com/material/18/868686/delete-forever--v2.png" class="delete_resp2"></div>');
+
+
+            $('.delete_resp2').click(function(){
+
+                var val = $(this).siblings('.orig_response2').val();
+                console.log(val);
+                var index = $(this).parent().parent().attr('data-roll');
+                responses[index] = responses[index].filter(function(item){
+                    return item != val;
+                });
+
+                console.log(responses[index]);
+                $(this).parent().remove();
+            })
+
+                $('.orig_response2').keypress(function(e){
+                ascii = e.which;
+                if (ascii==13){
+                    var val = $(this).val();
+                    var index = $(this).parent().parent().attr('data-roll');
+                    console.log('&&&'+index);
+                    $(this).attr('disabled',true );
+                    resp_count = index;
+                    responses[index].push(val);
+                    console.log(responses);
+                    $('.resp_add2').click();
+                }
+            })
+
+
+            })
+
+
+
+
+
+
+
+            })
+
+            $('.required').click(function(){
+                var arr = [];
+                var index = $(this).parent().parent().attr('data-roll');
+                arr.push(parameters_main[index]);
+                arr.push(entity_name_main[index]);
+                arr.push(prompt[index]);
+                if ($(this).prop('checked') == true){
+                    required[index] = arr;
+                    console.log(required);
+                }else if ($(this).prop('checked') == false){
+                    delete required[index];
+                    console.log(required);
+                }
+            })
+
+
+
+
+
+
+
+
+            /////////////////////////////////////////////////////////////////////
+
+
+
+
+
+    	})
+
+</script>
+
+
+</head>
+<body>
+    <div class="black_screen"></div>
+
+    <div class="prompt_block" data-roll=0>
+        <button class="magic"></button>
+        <div class="prompt_head"><h5>Prompts for "name"</h5></div>
+        <div class="prompt_sub">
+            <div class="namu">NAME<br><span>name</span></div>
+            <div class="entutu">ENTITY<br><span>@name</span></div>
+            <div class="valu">VALUE<br><span>$name</span></div>
+        </div>
+        <div class="prompts">
+
+            <!--
+            <div class="prompts_in"><div class="resp_logo"></div>
+                <div style="align-self: center;color: #868686">PROMPTS</div>
+            </div>
+            <div class="prompts_in"><div class="resp_logo">:</div>
+                <input type="text" class="orig_prompt" placeholder="Enter a prompt">
+                <img src="https://img.icons8.com/material/23/868686/delete-forever--v2.png" class="delete_prompt">
+            </div>
+            <div class="prompts_in">
+                <div class="resp_logo">:</div>
+                <input type="text" class="orig_prompt" placeholder="Enter a prompt variant">
+                <img src="https://img.icons8.com/material/23/868686/delete-forever--v2.png" class="delete_prompt">
+            </div>
+        -->
+
+        </div>
+        <div class="close_propmt">CLOSE</div>
+    </div>
+<div class="nav">
+	<div class="logo">
+		<div class="logos"><img src="{{ url_for('static',filename = 'Group 2.png') }}"></div>
+		<div class="name">ChitChat</div>
+	</div>
+
+    <form action="{{ url_for('selected') }}" class="hidden_selected" style="display: none" method="post">
+        <input type="submit" class="sub">
+        <input name="sel" class="selval">
+    </form>
+
+	<div class="select">
+	 <select class="form-control sel_project" id="exampleFormControlSelect1">
+		<option value="none" selected disabled hidden>Select Project</option>
+		{% for pnm in project_names %}
+		<option value={{pnm}}>{{ pnm }}</option>
+		{% endfor %}
+    </select>
+    <a href="#"><img src="https://img.icons8.com/windows/32/868686/settings.png"></a>
+
+	</div>
+	<div class="select"><a href="{{ url_for('welcome') }}" style="text-decoration:none;color:white;"><button type="button" class="btn btn-primary">
+		Create New Agent
+		<img src="https://img.icons8.com/material-outlined/30/ffffff/plus.png" style="left:5px;position: relative">
+	</button></a></div>
+
+	<div class="menus intents">
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/new-message.png" style="margin-right: 10px;">
+		        <a href="{{ url_for('intents') }}">Intents</a>
+		        <a href="{{ url_for('addintent') }}"><img src="https://img.icons8.com/material-outlined/30/868686/plus.png" style="position:absolute;right:15px;top:10px"></a>
+	  </div>
+	</div>
+
+	<div class="menus entities">
+
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/-message-exchange.png" style="margin-right: 10px;">
+		        <a href="{{ url_for('entities') }}">Entities</a>
+		        <a href="{{ url_for('addentity') }}"><img src="https://img.icons8.com/material-outlined/30/868686/plus.png" style="position:absolute;right:15px;top:10px"></a>
+	  </div>
+	</div>
+
+	<div class="menus history">
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/last-12-hours.png" style="margin-right: 10px;">
+		        <a href="#">History</a>
+	  </div>
+	</div>
+
+
+</div>
+
+<div class="main">
+
+
+
+	<div class="entity_input">
+        <img src="https://img.icons8.com/ios-filled/25/007BFF/quote.png">
+		<input type="text" class="form-control ename" placeholder="Intent Name" name="entity_name">
+        <button class="btn btn-primary submit">SAVE</button>
+        <br>
+        <br>
+	</div>
+	<!--<div class="box_entity">
+		<div class="subbox_entity" data-roll="0"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+		<div class="subbox_entity" data-roll="1"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+		<div class="subbox_entity" data-roll="2"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+		<div class="subbox_entity" data-roll="3"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+
+	</div>-->
+
+
+
+	<div class="box_entity">
+
+        <span class="hedohed">Training phrases</span>
+        <button class="add_phrase"></button>
+
+        <div class="subbox_entity" data-roll=0>
+
+            <div class="quote">
+                <center><img src="https://img.icons8.com/ios-filled/20/808080/quote-right.png"></center>
+            </div>
+
+            <div class="query_container"><input type="text" class="query" placeholder="Add user expression"></div>
+
+           <!-- <div contenteditable="true" class="query">Add user expression</div> -->
+            <img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete">
+
+        </div>
+        <div class="phrase_tab">
+            <table style="width:100%" class="intent_ent">
+  <tr>
+    <th>Parameter name</th>
+    <th>Entity</th>
+    <th>Resolved value</th>
+  </tr>
+</table>
+
+        </div>
+
+        <img src="https://img.icons8.com/metro/20/868686/sort-down.png" class="down">
+
+	</div>
+
+    <div class="box_entity2">
+        <span class="hedohed">Parameters</span>
+        <br>
+
+        <div class="subbbox_entity" data-roll=1>
+
+        <table class="intent_param">
+            <tr>
+    <th>Required</th>
+    <th>Parameter Name</th>
+    <th>Entity</th>
+    <th>Value</th>
+    <th>Prompt</th>
+  </tr>
+  <tr data-roll=0>
+    <td><input type="checkbox" name="" class="required" value="yes" disabled=True></td>
+    <td><input type="text" class="parameter" placeholder="Enter Name"></td>
+    <td>
+        <div class="entity_select">
+        <select>
+            <option value="none" selected disabled hidden>
+            Select Entity
+            </option>
+            {% for entity in entities %}
+            <option value={{ '@'+entity }}>{{ '@'+entity }}</option>
+            {% endfor %}
+        </select>
+        </div>
+    </td>
+    <td>$</td>
+    <td><span class="prompt">+ Add Prompt</span></td>
+  </tr>
+
+        </table>
+
+    </div>
+    <img src="https://img.icons8.com/metro/20/868686/sort-down.png" class="down">
+    <br>
+    <span style="color:#007BFF;cursor:pointer" class="add">+ New Parameter</span>
+</div>
+
+    <div class="box_entity3">
+        <span class="hedohed">Responses</span>
+
+   <div class="tab">
+
+        <div class="responses" data-roll=0>
+            <div class="head_resp">
+                Text Responses
+                <img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete_whole_resp">
+
+            </div>
+            <div class="response">
+                <div class="resp_logo">:)</div>
+                <input type="text" class="orig_response" placeholder="Enter a text response">
+                <img src="https://img.icons8.com/material/18/868686/delete-forever--v2.png" class="delete_resp">
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+    <br>
+    <div class="add_resp">ADD RESPONSE</div>
+
+    <button class="resp_add" style="display: none;"></button>
+    <button class="resp_add2" style="display: none;"></button>
+
+    <img src="https://img.icons8.com/metro/20/868686/sort-down.png" class="down">
+    </div>
+
+    <br><br>
+
+
+
+
+
+</div>
+
+<div class="bot">
+    <div class="bothead">
+
+        <div class="input_text"><input type="text" placeholder="Try it now"></div>
+        <div class="speak"><img src="https://img.icons8.com/material-rounded/26/868686/microphone.png"></div>
+    </div>
+
+    <div class="botsays com">
+        <div class="firstbot">USER SAYS</div>
+        <div>Hii</div>
+    </div>
+
+    <div class="botresponse com">
+        <br>
+        <div class="firstbot" style="display: flex;margin-right: 40px;position: relative;">
+            <div style="width:20px;height:20px;position: relative;margin-right:10px;">
+                <img src="{{ url_for('static',filename = 'Group 2.png') }}" style="position: absolute;width:100%;height:100%">
+            </div>
+            <div style="width:200px;">CHITCHAT RESPONSE</div>
+        </div>
+        <div class="botresp">Hi! i am arko, welcome to my world</div>
+        <br>
+        <br>
+    </div>
+
+    <div class="botintent com">
+        <br>
+        <div class="firstbot">INTENT</div>
+        <div class="intentbot" style="color:#007BFF">WELCOME</div>
+        <br>
+    </div>
+    <BR>
+    <BR>
+
+    <div class="botlast">
+        <center style="cursor: pointer;">DIAGNOSTIC INFO</center>
+    </div>
+
+
+</div>
+
+</body>
+</html>

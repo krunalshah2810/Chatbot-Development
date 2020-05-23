@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='styles/mainstyles.css')}}">
+	<title></title>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script type="text/javascript">
+	$(function(){
+		$(".ename").keypress(function(e){
+    			ascii = e.which;
+    			console.log(ascii);
+    			prev = $(this).val();
+    			latest = prev + String.fromCharCode(ascii);
+    			if ((ascii > 64 && ascii < 91) || (ascii == 45) || (ascii == 95) || (ascii > 96 && ascii < 123) || (ascii > 47 && ascii < 58)){
+    				$(".ename").css("border-color","#007BFF");
+    				console.log("Good to go!");
+
+    			}else{
+    				e.preventDefault();
+    				$(".ename").css("border-color","#93751C");
+    				$(".alert").remove();
+    				$(".entity_input br").remove();
+    				$(".entity_input").append('<br><br><div class="alert alert-warning alert-dismissible fade show" role="alert"><strong>Note :</strong> Entity name can contain only the following: A-Z, a-z, 0-9, _ (underscore), - (dash).<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+    			}
+    		});
+
+				$('.sel_project').change(function(){
+						var val = $(this).val();
+						console.log(val);
+						$('.hidden_selected .selval').attr('value',val);
+						$('.hidden_selected .sub').click();
+				})
+		/*	$(".btn-primary").click(function(){
+				var a = $("#agent").val()
+				if(a == "" )
+				{
+					alert("Enter Required Field");
+				}
+				else
+				{
+				  $.post('/welcomes',{data:a},function(message){
+          alert(message);
+					$("#clt").append(message);
+        });
+				}
+			}); */
+			$(".btn-primary").click(function(){
+			var a = $("#agent").val()
+			if(a == "" )
+			{
+				alert("Enter Required Field");
+			}
+			else
+			{
+				$.post('/welcomes',{data:a},function(message){
+				$("#clt").append(message);
+			});
+			}
+		});
+	})
+</script>
+
+
+</head>
+<body>
+<div class="nav">
+	<div class="logo">
+		<div class="logos"><img src="{{url_for('static', filename='logo.jpeg')}}"></div>
+		<div class="name">ChitChat</div>
+	</div>
+
+	<form action="{{ url_for('selected') }}" class="hidden_selected" style="display: none" method="post">
+			<input type="submit" class="sub">
+			<input name="sel" class="selval">
+	</form>
+
+	<div class="select">
+	 <select class="form-control sel_project" id="exampleFormControlSelect1">
+		 	<option value="none" selected disabled hidden>Select Project</option>
+			{% for pnm in project_names %}
+			<option value={{pnm}}>{{ pnm }}</option>
+			{% endfor %}
+    </select>
+    <a href="#"><img src="https://img.icons8.com/windows/32/B7BBC4/settings.png"></a>
+
+	</div>
+	<div class="select"><button type="button" class="btn btn-primary">
+		Create New Agent
+
+		<img src="https://img.icons8.com/material-outlined/30/ffffff/plus.png" style="left:5px;position: relative">
+	</button>
+	</div>
+
+	<div class="menus intents">
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/new-message.png" style="margin-right: 10px;">
+		        <a href="{{ url_for('intents') }}">Intents</a>
+		        <a href="{{ url_for('addintent') }}"><img src="https://img.icons8.com/material-outlined/30/868686/plus.png" style="position:absolute;right:15px;top:10px"></a>
+	  </div>
+	</div>
+
+	<div class="menus entities">
+
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/-message-exchange.png" style="margin-right: 10px;">
+		        <a href="{{ url_for('entities') }}">Entities</a>
+		        <a href="{{ url_for('addentity') }}"><img src="https://img.icons8.com/material-outlined/30/868686/plus.png" style="position:absolute;right:15px;top:10px"></a>
+	  </div>
+	</div>
+
+	<div class="menus history">
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/last-12-hours.png" style="margin-right: 10px;">
+		        <a href="#">History</a>
+	  </div>
+	</div>
+
+
+</div>
+
+<div class="main">
+	<div class="entity_input" >
+		<input type="text" id="agent" class="form-control ename" placeholder="Agent Name" name="entity_name"><button class="btn btn-primary submit"><a href="{{ url_for('addintent') }}" style="text-decoration:none;color:white;">CREATE</a></button>
+	</div>
+	<!--<input type="text"id="agent" class="form-control ename" placeholder="Default Language : English" name="entity_name">-->
+	<div style="border-bottom:2px solid grey; width:35%; float: left; margin-left: 20px;color:grey; font-family:arial; font-size:20px;">Default Language : <br><a style="font-size:16px;position:relative;top:1px;">English</a></div>
+	<div style="border-bottom:2px solid grey; width:35%; float: right; margin-right: 30px; color:grey; font-family:arial; font-size:20px;">Default Time Zone : <br><a style="font-size:16px;position:relative;top:1px;">GMT(+6:00)Asia</a></div>
+
+	<div class="cltmain"style="display:flex; width:700px;position:relative;left:45px;height:200px;margin-top:200px">
+		<div id="clt2" style=" width: 200px; height: 50px;border: 1px solid lightgrey;"><p style="position:relative;left:50px;top:10px">Client Token</p></div>
+		<div id="clt" style=" width: 400px; height: 50px;border: 1px solid lightgrey;;overflow-x:auto;text-indent: 20px;"></div>
+	</div>
+
+	<div class="card" style="position:relative;bottom:50px">
+  	<h5 class="card-header">Delete Agent</h5>
+  	<div class="card-body">
+    	<h5 class="card-title">Are you sure you want to delete agent?</h5>
+    	<p class="card-text">This will destroy the agent with all corresponding data and cannot be undone!</p>
+    <a href="#" class="btn btn-danger">Delete Agent</a>
+  	</div>
+	</div>
+</div>
+
+<div class="bot">
+	<h5 style="margin-top:300px;"><center>No Project selected!</center></h5>
+</div>
+
+</body>
+</html>

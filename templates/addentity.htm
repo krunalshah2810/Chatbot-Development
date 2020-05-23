@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename = 'adden.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename = 'bot.css') }}">
+	<title></title>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+
+	$(function(){
+
+        $('.input_text input').keypress(function(e){
+            var ascii = e.which;
+            if (ascii == 13){
+                var text = $(this).val();
+                $(this).attr('value',"");
+                $('.botsays .firstbot').next().text(text);
+                $.post('/chatbot',{
+                    message : text
+                },function(message){
+
+                    console.log(message)
+                    $('.input_text input').val("");
+
+                    var json = JSON.parse(message);
+                    var response = json['response'];
+                    $(".botresp").text(response);
+                    var int_name = json['intent']['name'];
+                    $(".intentbot").text(int_name)
+
+
+
+
+                })
+            }
+
+        })
+
+
+        $('.sel_project').change(function(){
+            var val = $(this).val();
+            console.log(val);
+            $('.hidden_selected .selval').attr('value',val);
+            $('.hidden_selected .sub').click();
+        })
+
+		var val_no = 3;
+    	var array = [[],[],[],[]];
+    	var dict = {};
+    	var values = [];
+
+
+        $(".submit").click(function(){
+            entity_name = $(".ename").val();
+            if ((entity_name == "") || (entity_name == " ")){
+                $(".entity_input").append('<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Warning :</strong> Please enter Entity name.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+            }else{
+                $.post("/send",{
+                    entity_name : entity_name,
+                    synonyms : JSON.stringify(array),
+                    values : JSON.stringify(values)
+                },function(message){
+                    $(".entity_input").append(message);
+                })
+            }
+        })
+
+
+    		$(".ename").keypress(function(e){
+    			ascii = e.which;
+    			console.log(ascii);
+    			prev = $(this).val();
+    			latest = prev + String.fromCharCode(ascii);
+    			if ((ascii > 64 && ascii < 91) || (ascii == 45) || (ascii == 95) || (ascii > 96 && ascii < 123) || (ascii > 47 && ascii < 58)){
+    				$(".ename").css("border-color","#007BFF");
+    				console.log("Good to go!");
+
+    			}else{
+    				e.preventDefault();
+    				$(".ename").css("border-color","#93751C");
+    				$(".alert").remove();
+    				$(".entity_input br").remove();
+    				$(".entity_input").append('<br><br><div class="alert alert-warning alert-dismissible fade show" role="alert"><strong>Note :</strong> Entity name can contain only the following: A-Z, a-z, 0-9, _ (underscore), - (dash).<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+    			}
+    		});
+
+
+
+    		$(".value_name").keypress(function(e){
+    			ascii = e.which;
+    			if (ascii == 13){
+    				index = $(this).parent().parent().attr('data-roll');
+    				values[index] = $(this).val();
+    				array[index].push($(this).val());
+    				console.log(array)
+    				console.log(values);
+    				$(this).parent().siblings('.synonymns').children('.enter_syn').remove();
+    				$(this).parent().siblings('.synonymns').append('<div class="synonym"><span>'+values[index]+'</span><span class="opaque"> </span><img src="https://img.icons8.com/ios-glyphs/16/868686/delete-sign.png" class="cancel"></div><div class="enter_syn"><input type="text" class="form-control synonym_name" placeholder="Enter synonym" name="entity_name"></div>');
+
+    				$('.synonym_name').keypress(function(e){
+    					ascii2 = e.which;
+    					if (ascii2 == 13){
+    						synonym = $(this).val();
+    						index = $(this).parent().parent().parent().attr('data-roll');
+    						console.log(index);
+    						array[index].push(synonym);
+    						console.log(array);
+    						$(this).parent().before('<div class="synonym"><span>'+synonym+'</span><span class="opaque"> </span><img src="https://img.icons8.com/ios-glyphs/16/868686/delete-sign.png" class="cancel"></div>');
+    						$(this).val("");
+
+    					}
+
+    					$(".cancel").click(function(){
+    			        index = $(this).parent().parent().parent().attr('data-roll');
+    			        text = $(this).parent().text();
+    			        console.log(text);
+    			        array[index] = array[index].filter(function(value,index,arr){
+    			        	return value+" " != text;
+    			        });
+    			        $(this).parent().remove();
+    			        console.log(array);
+    		        })
+
+
+    				})
+
+    				$(".cancel").click(function(){
+    			        index = $(this).parent().parent().parent().attr('data-roll');
+    			        text = $(this).parent().text();
+    			        console.log(text);
+    			        array[index] = array[index].filter(function(value,index,arr){
+    			        	return value+" " != text;
+    			        });
+    			        $(this).parent().remove();
+    			        console.log(array);
+    		        })
+
+    				/*$('.delete').click(function(e){
+    					console.log("delete")
+    					e.preventDefault();
+    					index = $(this).parent().attr("data-roll");
+    					values[index] = "";
+    					array[index] = [];
+    					$(this).parent().remove();
+
+    				})*/
+
+
+    			}
+    		})
+
+
+
+    		$(".entry").click(function(){
+    			$(this).children().removeClass('hidden');
+    			$(this).children('center').addClass('hidden');
+    			$(this).removeClass('entry');
+
+
+    		})
+
+    		$(".delete").click(function(){
+    			index = $(this).parent().attr("data-roll");
+    			values[index] = "";
+    			array[index] = [];
+    			$(this).parent().remove();
+    			console.log(index);
+    			console.log(array);
+    			console.log(values);
+
+    		})
+
+
+
+    		$(".add").click(function(){
+    			val_no = val_no + 1;
+    			array.push([]);
+    			console.log(val_no);
+    			$('.box_entity').append('<div class="subbox_entity entry" data-roll='+val_no+'><center>Click here to edit entry</center><div class="value hidden"><input type="text" class="form-control value_name" placeholder="Enter reference value" name="entity_name"></div><div class="synonymns hidden"><div class="enter_syn"><input type="text" class="form-control synonym_name" placeholder="Enter synonym" name="entity_name" disabled></div></div><img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete"></div>')
+
+    			$(".value_name").keypress(function(e){
+    			ascii = e.which;
+    			if (ascii == 13){
+    				index = $(this).parent().parent().attr('data-roll');
+    				values[index] = $(this).val();
+    				array[index].push($(this).val());
+    				console.log(array)
+    				console.log(values);
+    				$(this).parent().siblings('.synonymns').children('.enter_syn').remove();
+    				$(this).parent().siblings('.synonymns').append('<div class="synonym"><span>'+values[index]+'</span><span class="opaque"> </span><img src="https://img.icons8.com/ios-glyphs/16/868686/delete-sign.png" class="cancel"></div><div class="enter_syn"><input type="text" class="form-control synonym_name" placeholder="Enter synonym" name="entity_name"></div>');
+
+    				$('.synonym_name').keypress(function(e){
+    					ascii2 = e.which;
+    					if (ascii2 == 13){
+    						synonym = $(this).val();
+    						index = $(this).parent().parent().parent().attr('data-roll');
+    						console.log(index);
+    						array[index].push(synonym);
+    						console.log(array);
+    						$(this).parent().before('<div class="synonym"><span>'+synonym+'</span><span class="opaque"> </span><img src="https://img.icons8.com/ios-glyphs/16/868686/delete-sign.png" class="cancel"></div>');
+    						$(this).val("");
+
+    					}
+
+    					$(".cancel").click(function(){
+    			           index = $(this).parent().parent().parent().attr('data-roll');
+    			           text = $(this).parent().text();
+    			           console.log(text)
+    			           array[index] = array[index].filter(function(value,index,arr){
+    			        	return value+" " != text;
+    			           });
+    			           $(this).parent().remove();
+    			           console.log(array);
+    		        })
+
+
+    				})
+
+    				$(".cancel").click(function(){
+    			        index = $(this).parent().parent().parent().attr('data-roll');
+    			        text = $(this).parent().text();
+    			        console.log(text);
+    			        array[index] = array[index].filter(function(value,index,arr){
+    			        	return value+" " != text;
+    			        });
+    			        $(this).parent().remove();
+    			        console.log(array);
+    		        })
+
+
+
+    				/*$('.delete').click(function(e){
+    					console.log("delete");
+    					e.preventDefault();
+    					index = $(this).parent().attr("data-roll");
+    					values[index] = "";
+    					array[index] = [];
+    					$(this).parent().remove();
+
+    				})*/
+
+
+    			}
+    		})
+
+    			$(".delete").click(function(){
+
+    			        index = $(this).parent().attr("data-roll");
+    			        values[index] = "";
+    			        array[index] = [];
+    			        $(this).parent().remove();
+    			        console.log(index);
+    			        console.log(array);
+    			        console.log(values);
+
+    		          })
+
+
+
+
+
+    		$(".entry").click(function(){
+
+    			$(this).children().removeClass('hidden');
+    			$(this).children('center').addClass('hidden');
+    			$(this).removeClass('entry');
+
+
+    		})
+
+
+
+    		})
+
+
+
+    	})
+
+</script>
+
+
+</head>
+<body>
+<div class="nav">
+	<div class="logo">
+		<div class="logos"><img src="{{url_for('static',filename = 'Group 2.png')}}"></div>
+		<div class="name">ChitChat</div>
+	</div>
+
+    <form action="{{ url_for('selected') }}" class="hidden_selected" style="display: none" method="post">
+        <input type="submit" class="sub">
+        <input name="sel" class="selval">
+    </form>
+
+
+	<div class="select">
+	 <select class="form-control sel_project" id="exampleFormControlSelect1">
+		 <option value="none" selected disabled hidden>Select Project</option>
+		 {% for pnm in project_names %}
+		 <option value={{pnm}}>{{ pnm }}</option>
+		 {% endfor %}
+    </select>
+    <a href="#"><img src="https://img.icons8.com/windows/32/868686/settings.png"></a>
+
+	</div>
+	<div class="select"><a href="{{ url_for('welcome') }}" style="text-decoration:none;color:white;"><button type="button" class="btn btn-primary">
+		Create New Agent
+		<img src="https://img.icons8.com/material-outlined/30/ffffff/plus.png" style="left:5px;position: relative">
+	</button></a></div>
+
+	<div class="menus intents">
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/new-message.png" style="margin-right: 10px;">
+		        <a href="{{ url_for('intents') }}">Intents</a>
+		        <a href="{{ url_for('addintent') }}"><img src="https://img.icons8.com/material-outlined/30/868686/plus.png" style="position:absolute;right:15px;top:10px"></a>
+	  </div>
+	</div>
+
+	<div class="menus entities">
+
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/-message-exchange.png" style="margin-right: 10px;">
+		        <a href="{{ url_for('entities') }}">Entities</a>
+		        <a href="{{ url_for('addentity') }}"><img src="https://img.icons8.com/material-outlined/30/868686/plus.png" style="position:absolute;right:15px;top:10px"></a>
+	  </div>
+	</div>
+
+	<div class="menus history">
+	  <div style="position: relative;">
+			<img src="https://img.icons8.com/material-outlined/34/868686/last-12-hours.png" style="margin-right: 10px;">
+		        <a href="#">History</a>
+	  </div>
+	</div>
+
+
+</div>
+
+<div class="main">
+
+
+
+	<div class="entity_input">
+		<input type="text" class="form-control ename" placeholder="Entity Name" name="entity_name"><button class="btn btn-primary submit">SAVE</button>
+        <br>
+        <br>
+	</div>
+	<!--<div class="box_entity">
+		<div class="subbox_entity" data-roll="0"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+		<div class="subbox_entity" data-roll="1"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+		<div class="subbox_entity" data-roll="2"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+		<div class="subbox_entity" data-roll="3"><center>Click here to edit entry</center>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png">
+		</div>
+
+	</div>-->
+
+
+
+	<div class="box_entity">
+		<div class="subbox_entity" data-roll=0>
+
+			<div class="value">
+				<input type="text" class="form-control value_name" placeholder="Enter reference value" name="entity_name">
+			</div>
+
+			<div class="synonymns">
+				<div class="enter_syn"><input type="text" class="form-control synonym_name" placeholder="Enter synonym" name="entity_name" disabled></div>
+
+			</div>
+
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete">
+		</div>
+
+
+		<div class="subbox_entity entry" data-roll=1>
+			<center>Click here to edit entry</center>
+			<div class="value hidden">
+				<input type="text" class="form-control value_name" placeholder="Enter reference value" name="entity_name">
+			</div>
+
+			<div class="synonymns hidden">
+				<div class="enter_syn"><input type="text" class="form-control synonym_name" placeholder="Enter synonym" name="entity_name" disabled></div>
+
+			</div>
+
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete">
+		</div>
+		<div class="subbox_entity entry" data-roll=2>
+			<center>Click here to edit entry</center>
+			<div class="value hidden">
+				<input type="text" class="form-control value_name" placeholder="Enter reference value" name="entity_name">
+			</div>
+
+			<div class="synonymns hidden">
+				<div class="enter_syn"><input type="text" class="form-control synonym_name" placeholder="Enter synonym" name="entity_name" disabled></div>
+
+			</div>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete">
+		</div>
+
+		<div class="subbox_entity entry" data-roll=3>
+			<center>Click here to edit entry</center>
+			<div class="value hidden">
+				<input type="text" class="form-control value_name" placeholder="Enter reference value" name="entity_name">
+			</div>
+
+			<div class="synonymns hidden">
+				<div class="enter_syn"><input type="text" class="form-control synonym_name" placeholder="Enter synonym" name="entity_name" disabled></div>
+
+			</div>
+			<img src="https://img.icons8.com/material/24/868686/delete-forever--v2.png" class="delete">
+		</div>
+
+	</div>
+	<br><br>
+
+	<span style="color:#007BFF;cursor:pointer" class="add">+ Add a row</span>
+
+
+
+</div>
+
+<div class="bot">
+    <div class="bothead">
+
+        <div class="input_text"><input type="text" placeholder="Try it now"></div>
+        <div class="speak"><img src="https://img.icons8.com/material-rounded/26/868686/microphone.png"></div>
+    </div>
+
+    <div class="botsays com">
+        <div class="firstbot">USER SAYS</div>
+        <div>Hii</div>
+    </div>
+
+    <div class="botresponse com">
+        <br>
+        <div class="firstbot" style="display: flex;margin-right: 40px;position: relative;">
+            <div style="width:20px;height:20px;position: relative;margin-right:10px;">
+                <img src="{{ url_for('static',filename = 'Group 2.png') }}" style="position: absolute;width:100%;height:100%">
+            </div>
+            <div style="width:200px;">CHITCHAT RESPONSE</div>
+        </div>
+        <div class="botresp">Hi! i am arko, welcome to my world</div>
+        <br>
+        <br>
+    </div>
+
+    <div class="botintent com">
+        <br>
+        <div class="firstbot">INTENT</div>
+        <div class="intentbot" style="color:#007BFF">WELCOME</div>
+        <br>
+    </div>
+    <BR>
+    <BR>
+
+    <div class="botlast">
+        <center style="cursor: pointer;">DIAGNOSTIC INFO</center>
+    </div>
+
+
+</div>
+
+</body>
+</html>
